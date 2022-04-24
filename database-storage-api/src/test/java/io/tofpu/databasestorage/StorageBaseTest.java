@@ -1,7 +1,6 @@
 package io.tofpu.databasestorage;
 
 import io.tofpu.databasestorage.data.PlayerProfile;
-import io.tofpu.databasestorage.resolver.value.StorageValueResolver;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -10,15 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -43,7 +39,7 @@ public class StorageBaseTest {
     @Test
     @Order(2)
     public void profile_should_be_inserted() throws ExecutionException, InterruptedException {
-        assertTrue(storageBase.save(playerProfile.getUUID(), playerProfile)
+        assertTrue(storageBase.saveAsync(playerProfile.getUUID(), playerProfile)
                 .get(), "Profile was not saved");
     }
 
@@ -61,10 +57,10 @@ public class StorageBaseTest {
     @Test
     @Order(4)
     public void profile_should_be_deleted() throws ExecutionException, InterruptedException {
-        assertTrue(storageBase.delete(playerProfile.getUUID(), PlayerProfile.class)
+        assertTrue(storageBase.deleteAsync(playerProfile.getUUID(), PlayerProfile.class)
                 .get(), "Profile was not deleted");
 
-        assertNotNull(storageBase.retrieveAsync(playerProfile.getUUID(), PlayerProfile.class)
+        assertNull(storageBase.retrieveAsync(playerProfile.getUUID(), PlayerProfile.class)
                 .get(), "Profile was not deleted");
     }
 

@@ -35,7 +35,7 @@ public class PlayerProfileValueResolver extends StorageValueResolver<UUID, Playe
     }
 
     @Override
-    public PlayerProfile retrieve(final String key) {
+    public PlayerProfile retrieve(final String key) throws SQLException {
         final Connection connection = storageBase.getConnection();
 
         try (final PreparedStatement statement = connection.prepareStatement(SELECT_PROFILE_QUERY)) {
@@ -50,13 +50,16 @@ public class PlayerProfileValueResolver extends StorageValueResolver<UUID, Playe
 
                 return new PlayerProfile(UUID.fromString(resultSet.getString("id")), resultSet.getString("name"));
             }
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
         }
     }
 
     @Override
-    public PlayerProfile delete(final String key) {
-        return null;
+    public void delete(final String key) throws SQLException {
+        final Connection connection = storageBase.getConnection();
+
+        try (final PreparedStatement statement = connection.prepareStatement("DELETE FROM player_profile WHERE id = ?")) {
+            statement.setString(1, key);
+            statement.executeUpdate();
+        }
     }
 }
