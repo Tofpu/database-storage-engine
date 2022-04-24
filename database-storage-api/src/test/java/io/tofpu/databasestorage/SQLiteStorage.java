@@ -1,5 +1,6 @@
 package io.tofpu.databasestorage;
 
+import io.tofpu.databasestorage.data.mapper.PlayerProfileValueResolver;
 import io.tofpu.databasestorage.resolver.value.StorageValueResolver;
 import io.tofpu.databasestorage.resolver.key.StorageKeyResolver;
 
@@ -43,7 +44,7 @@ public class SQLiteStorage extends StorageBase {
         return future;
     }
 
-    private void establishConnection() {
+    protected void establishConnection() {
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:test.db");
         } catch (Exception e) {
@@ -62,7 +63,7 @@ public class SQLiteStorage extends StorageBase {
 
     @Override
     List<StorageValueResolver<?, ?>> getValueResolvers() {
-        return Arrays.asList(new StorageBaseTest.PlayerProfileMapper(this));
+        return Arrays.asList(new PlayerProfileValueResolver(this));
     }
 
     @Override
@@ -71,7 +72,7 @@ public class SQLiteStorage extends StorageBase {
     }
 
     @Override
-    Connection getConnection() {
+    public Connection getConnection() {
         if (connection == null) {
             establishConnection();
         }

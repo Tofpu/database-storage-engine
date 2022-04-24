@@ -12,10 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public abstract class StorageBase {
     private final Map<Class<?>, StorageValueResolver<?, ?>> valueResolverMap = new HashMap<>();
     private final Map<Class<?>, StorageKeyResolver<?>> keyResolverMap = new HashMap<>();
+
+    private final ExecutorService executorService = getExecutorService();
 
     protected StorageBase() {
         for (final StorageValueResolver<?, ?> mapper : getValueResolvers()) {
@@ -35,7 +39,8 @@ public abstract class StorageBase {
     abstract List<StorageValueResolver<?, ?>> getValueResolvers();
     abstract List<StorageKeyResolver<?>> getKeyResolvers();
 
-    abstract Connection getConnection();
+    protected abstract void establishConnection();
+    public abstract Connection getConnection();
 
     public CompletableFuture<Boolean> save(final Object key, final Object value) {
         final CompletableFuture<Boolean> future = new CompletableFuture<>();
@@ -58,7 +63,7 @@ public abstract class StorageBase {
                 future.completeExceptionally(e);
                 throw new IllegalStateException(e);
             }
-        });
+        }, executorService);
 
         return future;
     }
@@ -75,7 +80,7 @@ public abstract class StorageBase {
             throw new IllegalArgumentException("No valueResolver found for value type " + valueType);
         }
 
-        return (CompletableFuture<T>) CompletableFuture.supplyAsync(() -> valueResolver.retrieve(keyResolver.serialize(key)));
+        return (CompletableFuture<T>) CompletableFuture.supplyAsync(() -> valueResolver.retrieve(keyResolver.serialize(key)), executorService);
     }
 
     public CompletableFuture<Boolean> delete(final Object key, final Class<?> valueType) {
@@ -94,9 +99,21 @@ public abstract class StorageBase {
         CompletableFuture.runAsync(() -> {
             valueResolver.delete(keyResolver.serialize(key));
             future.complete(true);
-        });
+        }, executorService);
 
         return future;
+    }
+
+    public ExecutorService getExecutorService() {
+        return Executors.newFixedThreadPool(2);
+    }
+
+    public <T> StorageValueResolver<?, T> getValueResolver(final Class<T> type) {
+        return (StorageValueResolver<?, T>) valueResolverMap.get(type);
+    }
+
+    public <T> StorageKeyResolver<T> getKeyResolver(final Class<T> type) {
+        return (StorageKeyResolver<T>) keyResolverMap.get(type);
     }
 
     public void shutdown() {
@@ -108,13 +125,7 @@ public abstract class StorageBase {
                 throw new IllegalStateException(e);
             }
         }
-    }
 
-    public <T> StorageValueResolver<?, T> getValueResolver(final Class<T> type) {
-        return (StorageValueResolver<?, T>) valueResolverMap.get(type);
-    }
-
-    public <T> StorageKeyResolver<T> getKeyResolver(final Class<T> type) {
-        return (StorageKeyResolver<T>) keyResolverMap.get(type);
+        executorService.shutdown();
     }
 }
