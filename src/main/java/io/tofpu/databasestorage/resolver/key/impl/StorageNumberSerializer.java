@@ -11,9 +11,4 @@ public class StorageNumberSerializer extends StorageKeyResolver<Number> {
     public String serialize(final Object obj) {
         return obj.toString();
     }
-
-    @Override
-    public Number deserialize(final String serialized) {
-        return Number.class.cast(serialized);
-    }
 }

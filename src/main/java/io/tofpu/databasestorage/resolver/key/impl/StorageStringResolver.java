@@ -11,9 +11,4 @@ public class StorageStringResolver extends StorageKeyResolver<String> {
     public String serialize(final Object obj) {
         return obj.toString();
     }
-
-    @Override
-    public String deserialize(final String serialized) {
-        return serialized;
-    }
 }

@@ -13,9 +13,4 @@ public class StorageUUIDResolver extends StorageKeyResolver<UUID> {
     public String serialize(final Object obj) {
         return obj.toString();
     }
-
-    @Override
-    public UUID deserialize(final String serialized) {
-        return UUID.fromString(serialized);
-    }
 }
