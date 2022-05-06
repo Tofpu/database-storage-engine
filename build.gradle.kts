@@ -1,5 +1,6 @@
 plugins {
     java
+    id("maven-publish")
 }
 
 allprojects {
@@ -21,5 +22,14 @@ allprojects {
 
     tasks.getByName<Test>("test") {
         useJUnitPlatform()
+    }
+}
+
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
     }
 }
