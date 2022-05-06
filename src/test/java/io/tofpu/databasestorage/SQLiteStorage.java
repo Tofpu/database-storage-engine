@@ -18,7 +18,7 @@ public class SQLiteStorage extends StorageBase {
     private Connection connection;
 
     @Override
-    CompletableFuture<Boolean> init() {
+    public CompletableFuture<Boolean> init() {
         final CompletableFuture<Boolean> future = new CompletableFuture<>();
 
         try {
@@ -44,6 +44,7 @@ public class SQLiteStorage extends StorageBase {
         return future;
     }
 
+    @Override
     protected void establishConnection() {
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:test.db");
@@ -62,12 +63,12 @@ public class SQLiteStorage extends StorageBase {
     }
 
     @Override
-    List<StorageValueResolver<?, ?>> getValueResolvers() {
+    protected List<StorageValueResolver<?, ?>> getValueResolvers() {
         return Arrays.asList(new PlayerProfileValueResolver(this));
     }
 
     @Override
-    List<StorageKeyResolver<?>> getKeyResolvers() {
+    protected List<StorageKeyResolver<?>> getKeyResolvers() {
         return Collections.emptyList();
     }
 

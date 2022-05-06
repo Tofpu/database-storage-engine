@@ -42,7 +42,7 @@ public abstract class StorageBase {
      *
      * @return true if the connection was established, false otherwise
      */
-    abstract CompletableFuture<Boolean> init();
+    public abstract CompletableFuture<Boolean> init();
 
     /**
      * You can specify a list of {@link StorageValueResolver}s to be used by the
@@ -50,7 +50,7 @@ public abstract class StorageBase {
      *
      * @return a list of {@link StorageValueResolver}s
      */
-    abstract List<StorageValueResolver<?, ?>> getValueResolvers();
+    protected abstract List<StorageValueResolver<?, ?>> getValueResolvers();
 
     /**
      * You can specify a list of {@link StorageKeyResolver}s to be used by the
@@ -58,7 +58,7 @@ public abstract class StorageBase {
      *
      * @return a list of {@link StorageKeyResolver}s
      */
-    abstract List<StorageKeyResolver<?>> getKeyResolvers();
+    protected abstract List<StorageKeyResolver<?>> getKeyResolvers();
 
     /**
      * This method should establish a connection to the database when called.
