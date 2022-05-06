@@ -1,25 +1,31 @@
 plugins {
     java
+    id("maven-publish")
 }
 
-allprojects {
-    apply {
-        plugin("java")
-    }
+group = "io.tofpu"
+version = "1.0.0"
 
-    group = "io.tofpu"
-    version = "1.0.0"
+repositories {
+    mavenCentral()
+}
 
-    repositories {
-        mavenCentral()
-    }
+dependencies {
+    testImplementation("org.xerial:sqlite-jdbc:3.36.0.3")
 
-    dependencies {
-        testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    }
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+}
 
-    tasks.getByName<Test>("test") {
-        useJUnitPlatform()
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
     }
+}
+
+tasks.getByName<Test>("test") {
+    useJUnitPlatform()
 }
